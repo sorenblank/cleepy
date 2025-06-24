@@ -13,7 +13,7 @@ interface VideoControlsProps {
 
 export default function VideoControls({
     className = '',
-    totalDuration = 580, // default 9:40 (9 minutes 40 seconds)
+    totalDuration = 0,
     currentTime = 0,
     onTimeChange,
     onRangeChange,
@@ -172,71 +172,74 @@ export default function VideoControls({
             {/* Progress bar container */}
             <div
                 ref={progressBarRef}
-                className="w-full h-8 rounded bg-gray-200 flex flex-row items-center relative cursor-pointer"
+                className="w-full h-8 rounded bg-gray-200 flex flex-row items-center justify-center px-[6px]"
             >
-                {/* Background track */}
-                <div className="w-full h-[4px] bg-stone-500 rounded-full mx-[6px]" />
+                <div ref={progressBarRef}
+                    className='w-full h-full rounded flex flex-row items-center justify-center relative cursor-pointer'>
+                    {/* Background track */}
+                    <div className="w-full h-[4px] bg-stone-500 rounded-full" />
 
-                {/* Selected range background */}
-                <div
-                    className="h-[4px] bg-blue-600 rounded-full absolute"
-                    style={{
-                        left: `calc(6px + ${(getPositionPercent(leftRange) * (100 - 1.4)) / 100}%)`,
-                        width: `calc(${((getPositionPercent(rightRange) - getPositionPercent(leftRange)) * (100 - 1.4)) / 100}%)`
-                    }}
-                />
+                    {/* Selected range background */}
+                    <div
+                        className="h-[4px] bg-blue-600 rounded-full absolute"
+                        style={{
+                            left: `calc(${(getPositionPercent(leftRange) * (100 - 1.4)) / 100}%)`,
+                            width: `calc(${((getPositionPercent(rightRange) - getPositionPercent(leftRange)) * (100 - 1.4)) / 100}%)`
+                        }}
+                    />
 
-                {/* Current progress indicator */}
-                <div
-                    className="w-[8px] h-[18px] rounded-full absolute bg-red-600 cursor-grab active:cursor-grabbing"
-                    style={{
-                        left: `calc(6px + ${(getPositionPercent(currentProgress) * (100 - 1.4)) / 100}% - 4px)`
-                    }}
-                    onMouseDown={handleMouseDown('progress')}
-                />
+                    {/* Current progress indicator */}
+                    <div
+                        className="w-[8px] h-[18px] rounded-full absolute bg-red-600 cursor-grab active:cursor-grabbing"
+                        style={{
+                            left: `calc(${(getPositionPercent(currentProgress) * (100 - 1.4)) / 100}%)`
+                        }}
+                        onMouseDown={handleMouseDown('progress')}
+                    />
 
-                {/* Left range selector */}
-                <div
-                    className="w-[8px] h-[18px] rounded-full absolute bg-blue-600 cursor-grab active:cursor-grabbing"
-                    style={{
-                        left: `calc(6px + ${(getPositionPercent(leftRange) * (100 - 1.4)) / 100}% - 4px)`
-                    }}
-                    onMouseDown={handleMouseDown('left')}
-                />
+                    {/* Left range selector */}
+                    <div
+                        className="w-[8px] h-[18px] rounded-full absolute bg-blue-600 cursor-grab active:cursor-grabbing"
+                        style={{
+                            left: `calc(${(getPositionPercent(leftRange) * (100 - 1.4)) / 100}%)`
+                        }}
+                        onMouseDown={handleMouseDown('left')}
+                    />
 
-                {/* Left range timestamp */}
-                <div
-                    className="w-min px-1 h-[20px] rounded-full absolute bg-blue-600 flex items-center justify-center"
-                    style={{
-                        left: `calc(6px + ${(getPositionPercent(leftRange) * (100 - 1.4)) / 100}% - 15px)`,
-                        top: '-14px'
-                    }}
-                >
-                    <p className="text-white text-xs font-medium leading-[8px] whitespace-nowrap">
-                        {formatTime(leftRange)}
-                    </p>
-                </div>
+                    {/* Left range timestamp */}
+                    <div
+                        className="w-min px-1 h-[20px] rounded-full absolute bg-blue-600 flex items-center justify-center"
+                        style={{
+                            left: `calc(${(getPositionPercent(leftRange) * (100 - 1.4)) / 100}% - 12px)`,
+                            top: '-14px'
+                        }}
+                    >
+                        <p className="text-white text-xs font-medium leading-[8px] whitespace-nowrap">
+                            {formatTime(leftRange)}
+                        </p>
+                    </div>
 
-                {/* Right range selector */}
-                <div
-                    className="w-[8px] h-[18px] rounded-full absolute bg-blue-600 cursor-grab active:cursor-grabbing z-40"
-                    style={{
-                        left: `calc(6px + ${(getPositionPercent(rightRange) * (100 - 1.4)) / 100}% - 8px)`
-                    }}
-                    onMouseDown={handleMouseDown('right')}
-                />
+                    {/* Right range selector */}
+                    <div
+                        className="w-[8px] h-[18px] rounded-full absolute bg-blue-600 cursor-grab active:cursor-grabbing z-40"
+                        style={{
+                            left: `calc(${(getPositionPercent(rightRange) * (100 - 1.4)) / 100}%)`
+                        }}
+                        onMouseDown={handleMouseDown('right')}
+                    />
 
-                {/* Right range timestamp */}
-                <div
-                    className="w-min px-1 h-[20px] rounded-full absolute bg-blue-600 flex items-center justify-center z-40"
-                    style={{
-                        left: `calc(6px + ${(getPositionPercent(rightRange) * (100 - 1.4)) / 100}% - 15px)`,
-                        top: '-14px'
-                    }}
-                >
-                    <p className="text-white text-xs font-medium leading-[8px] whitespace-nowrap">
-                        {formatTime(rightRange)}
-                    </p>
+                    {/* Right range timestamp */}
+                    <div
+                        className="w-min px-1 h-[20px] rounded-full absolute bg-blue-600 flex items-center justify-center z-40"
+                        style={{
+                            left: `calc(${(getPositionPercent(rightRange) * (100 - 1.4)) / 100}% - 12px)`,
+                            top: '-14px'
+                        }}
+                    >
+                        <p className="text-white text-xs font-medium leading-[8px] whitespace-nowrap">
+                            {formatTime(rightRange)}
+                        </p>
+                    </div>
                 </div>
             </div>
 
