@@ -19,8 +19,8 @@ export default function VideoControls({
     onRangeChange,
     onExport
 }: VideoControlsProps) {
-    const [leftRange, setLeftRange] = useState(60); // 1 minute in seconds
-    const [rightRange, setRightRange] = useState(480); // 8 minutes in seconds
+    const [leftRange, setLeftRange] = useState(0); // start of video
+    const [rightRange, setRightRange] = useState(totalDuration); // end of video
     const [currentProgress, setCurrentProgress] = useState(currentTime);
     const [isDragging, setIsDragging] = useState<'left' | 'right' | 'progress' | null>(null);
     const [showLeftInput, setShowLeftInput] = useState(false);
@@ -112,6 +112,11 @@ export default function VideoControls({
     useEffect(() => {
         setCurrentProgress(currentTime);
     }, [currentTime]);
+
+    // Update right range when total duration changes
+    useEffect(() => {
+        setRightRange(totalDuration);
+    }, [totalDuration]);
 
     // Handle custom time input for left range
     const handleLeftTimeSubmit = () => {

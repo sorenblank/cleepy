@@ -1,18 +1,18 @@
 'use client';
 
-import { useState } from 'react';
-
 interface PlayPauseButtonProps {
     className?: string;
+    isPlaying?: boolean;
     onStateChange?: (isPlaying: boolean) => void;
 }
 
-export default function PlayPauseButton({ className = '', onStateChange }: PlayPauseButtonProps) {
-    const [isPlaying, setIsPlaying] = useState(false);
-
+export default function PlayPauseButton({
+    className = '',
+    isPlaying = true,
+    onStateChange
+}: PlayPauseButtonProps) {
     const handleClick = () => {
         const newState = !isPlaying;
-        setIsPlaying(newState);
         onStateChange?.(newState);
     };
 

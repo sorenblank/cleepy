@@ -1,13 +1,44 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import ControlsSection from './components/ControlsSection';
-import VideoTabSection from './components/VideoTabSection';
+import VideoTabSection, { VideoTabSectionRef } from './components/VideoTabSection';
 
 export default function Home() {
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
-  const [totalDuration, setTotalDuration] = useState(580); // 9 minutes 40 seconds default
+  const [totalDuration, setTotalDuration] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(true);
+
+  const videoPlayerRef = useRef<VideoTabSectionRef>(null);
+
+  // Add keyboard event listener for spacebar play/pause
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Only handle spacebar when video is loaded
+      if (event.code === 'Space' && isVideoLoaded) {
+        event.preventDefault(); // Prevent page scrolling
+        const newIsPlaying = !isPlaying;
+        setIsPlaying(newIsPlaying);
+        // Control the video player
+        if (videoPlayerRef.current) {
+          if (newIsPlaying) {
+            videoPlayerRef.current.play();
+          } else {
+            videoPlayerRef.current.pause();
+          }
+        }
+      }
+    };
+
+    // Add event listener
+    document.addEventListener('keydown', handleKeyDown);
+
+    // Cleanup event listener on unmount
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isVideoLoaded, isPlaying]); // Dependencies: re-run when these change
 
   const handleSearchStart = () => {
     // Keep the controls hidden during loading
@@ -22,11 +53,23 @@ export default function Home() {
   const handleClose = () => {
     // Reset to default state - hide controls
     setIsVideoLoaded(false);
+    setIsPlaying(false);
+  };
+
+  const handleProgress = (currentTime: number, duration: number) => {
+    setCurrentTime(currentTime);
+    // Only update duration if it's a valid number and different from current
+    if (duration && !isNaN(duration) && duration !== totalDuration) {
+      setTotalDuration(duration);
+    }
   };
 
   const handleTimeChange = (time: number) => {
     setCurrentTime(time);
-    // Here you would typically update your video player's current time
+    // Seek the video player to the new time
+    if (videoPlayerRef.current) {
+      videoPlayerRef.current.seekTo(time);
+    }
     console.log('Time changed to:', time);
   };
 
@@ -35,9 +78,22 @@ export default function Home() {
     console.log('Range changed:', leftTime, 'to', rightTime);
   };
 
-  const handlePlayStateChange = (isPlaying: boolean) => {
-    // Handle play/pause state changes
-    console.log('Playing:', isPlaying);
+  const handlePlayStateChange = (newIsPlaying: boolean) => {
+    setIsPlaying(newIsPlaying);
+    // Control the video player
+    if (videoPlayerRef.current) {
+      if (newIsPlaying) {
+        videoPlayerRef.current.play();
+      } else {
+        videoPlayerRef.current.pause();
+      }
+    }
+    console.log('Playing:', newIsPlaying);
+  };
+
+  const handleVideoPlayStateChange = (newIsPlaying: boolean) => {
+    // This handles play state changes from the video player itself
+    setIsPlaying(newIsPlaying);
   };
 
   const handleExport = (leftTime: number, rightTime: number) => {
@@ -50,9 +106,12 @@ export default function Home() {
     <main className="flex flex-col items-center justify-center h-screen">
       {/* the video tab / player and initial state */}
       <VideoTabSection
+        ref={videoPlayerRef}
         onSearchStart={handleSearchStart}
         onLoadingComplete={handleLoadingComplete}
         onClose={handleClose}
+        onPlayStateChange={handleVideoPlayStateChange}
+        onProgress={handleProgress}
       />
 
       {/* the controls tab */}
@@ -60,6 +119,7 @@ export default function Home() {
         isVideoLoaded={isVideoLoaded}
         totalDuration={totalDuration}
         currentTime={currentTime}
+        isPlaying={isPlaying}
         onTimeChange={handleTimeChange}
         onRangeChange={handleRangeChange}
         onPlayStateChange={handlePlayStateChange}
