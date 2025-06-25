@@ -17,7 +17,7 @@ export default function VideoControls({
     currentTime = 0,
     onTimeChange,
     onRangeChange,
-    onExport
+    onExport: _onExport
 }: VideoControlsProps) {
     const [leftRange, setLeftRange] = useState(0); // start of video
     const [rightRange, setRightRange] = useState(totalDuration); // end of video

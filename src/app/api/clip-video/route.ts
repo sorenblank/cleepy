@@ -131,8 +131,8 @@ export async function POST(request: NextRequest) {
     try {
       await access(ytDlpPath);
       await runCommand(ytDlpPath, ["--version"]);
-    } catch (error) {
-      console.error("Local yt-dlp not found:", error);
+    } catch (_error) {
+      console.error("Local yt-dlp not found:", _error);
       return NextResponse.json(
         {
           error:
@@ -176,8 +176,8 @@ export async function POST(request: NextRequest) {
     // Clean up the temporary file
     try {
       await unlink(outputPath);
-    } catch (error) {
-      console.warn("Failed to cleanup temp file:", error);
+    } catch (_error) {
+      console.warn("Failed to cleanup temp file:", _error);
     }
 
     // Generate filename for download
