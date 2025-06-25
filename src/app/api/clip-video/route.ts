@@ -92,9 +92,10 @@ export async function POST(request: NextRequest) {
     }
 
     const jobId = createJobId();
-    const tempDir = path.join(process.cwd(), "temp");
+    // Use /tmp directory which is writable in serverless environments like Vercel
+    const tempDir = "/tmp";
 
-    // Ensure temp directory exists
+    // Ensure temp directory exists (though /tmp should always exist in serverless)
     if (!fs.existsSync(tempDir)) {
       fs.mkdirSync(tempDir, { recursive: true });
     }
