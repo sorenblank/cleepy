@@ -9,6 +9,8 @@ export default function Home() {
   const [currentTime, setCurrentTime] = useState(0);
   const [totalDuration, setTotalDuration] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
+  const [isExporting, setIsExporting] = useState(false);
+  const [exportError, setExportError] = useState<string | null>(null);
 
   const videoPlayerRef = useRef<VideoTabSectionRef>(null);
 
@@ -96,10 +98,80 @@ export default function Home() {
     setIsPlaying(newIsPlaying);
   };
 
-  const handleExport = (leftTime: number, rightTime: number) => {
+  const handleExport = async (leftTime: number, rightTime: number) => {
     // Handle export functionality
     console.log('Exporting from', leftTime, 'to', rightTime);
-    alert(`Exporting video segment from ${Math.floor(leftTime / 60)}:${(leftTime % 60).toString().padStart(2, '0')} to ${Math.floor(rightTime / 60)}:${(rightTime % 60).toString().padStart(2, '0')}`);
+
+    // Clear any previous export error
+    setExportError(null);
+
+    if (!videoPlayerRef.current) {
+      setExportError('No video loaded');
+      return;
+    }
+
+    const videoUrl = videoPlayerRef.current.getCurrentVideoUrl();
+    const videoTitle = videoPlayerRef.current.getCurrentVideoTitle();
+
+    if (!videoUrl) {
+      setExportError('No video URL available');
+      return;
+    }
+
+    setIsExporting(true);
+
+    try {
+      const response = await fetch('/api/clip-video', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          url: videoUrl,
+          startTime: leftTime,
+          endTime: rightTime,
+          videoTitle: videoTitle,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to export video');
+      }
+
+      // Get the video blob from the response
+      const blob = await response.blob();
+
+      // Create a download link
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+
+      // Get filename from Content-Disposition header or create a default one
+      const contentDisposition = response.headers.get('Content-Disposition');
+      let filename = `clip_${Math.floor(leftTime)}s-${Math.floor(rightTime)}s.mp4`;
+
+      if (contentDisposition) {
+        const filenameMatch = contentDisposition.match(/filename="([^"]+)"/);
+        if (filenameMatch) {
+          filename = filenameMatch[1];
+        }
+      }
+
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+
+      console.log('Export completed successfully');
+    } catch (error) {
+      console.error('Export failed:', error);
+      setExportError(error instanceof Error ? error.message : 'Failed to export video');
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   return (
@@ -124,6 +196,8 @@ export default function Home() {
         onRangeChange={handleRangeChange}
         onPlayStateChange={handlePlayStateChange}
         onExport={handleExport}
+        isExporting={isExporting}
+        exportError={exportError}
       />
     </main>
   );

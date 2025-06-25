@@ -14,6 +14,8 @@ interface ControlsSectionProps {
     onRangeChange?: (leftTime: number, rightTime: number) => void;
     onPlayStateChange?: (isPlaying: boolean) => void;
     onExport?: (leftTime: number, rightTime: number) => void;
+    isExporting?: boolean;
+    exportError?: string | null;
 }
 
 export default function ControlsSection({
@@ -25,7 +27,9 @@ export default function ControlsSection({
     onTimeChange,
     onRangeChange,
     onPlayStateChange,
-    onExport
+    onExport,
+    isExporting = false,
+    exportError = null
 }: ControlsSectionProps) {
     const [leftTime, setLeftTime] = useState(0); // start of video
     const [rightTime, setRightTime] = useState(totalDuration); // end of video
@@ -74,13 +78,33 @@ export default function ControlsSection({
             </div>
 
             {/* export button */}
-            <button
-                className="w-28 h-8 bg-amber-300 rounded-2xl flex items-center justify-center gap-1 hover:bg-amber-400 transition-all duration-100 ease-in-out"
-                onClick={handleExport}
-            >
-                <img src="/export.svg" alt="export" className="w-4 h-4 origin-center" />
-                <p className="text-white font-semibold text-xs">Export</p>
-            </button>
+            <div className="flex flex-col items-center gap-1">
+                <button
+                    className={`w-28 h-8 rounded-2xl flex items-center justify-center gap-1 transition-all duration-100 ease-in-out ${isExporting
+                        ? 'bg-amber-400/50 cursor-not-allowed'
+                        : 'bg-amber-300 hover:bg-amber-400'
+                        }`}
+                    onClick={handleExport}
+                    disabled={isExporting}
+                >
+                    {isExporting ? (
+                        <>
+                            <div className="w-3 h-3 border border-white border-t-transparent rounded-full animate-spin" />
+                            <p className="text-white font-semibold text-xs">Exporting...</p>
+                        </>
+                    ) : (
+                        <>
+                            <img src="/export.svg" alt="export" className="w-4 h-4 origin-center" />
+                            <p className="text-white font-semibold text-xs">Export</p>
+                        </>
+                    )}
+                </button>
+                {exportError && (
+                    <div className="text-red-500 text-xs max-w-28 text-center truncate" title={exportError}>
+                        {exportError}
+                    </div>
+                )}
+            </div>
         </div>
     );
 } 

@@ -15,6 +15,8 @@ export interface VideoTabSectionRef {
     play: () => void;
     pause: () => void;
     seekTo: (seconds: number) => void;
+    getCurrentVideoUrl: () => string;
+    getCurrentVideoTitle: () => string;
 }
 
 const VideoTabSection = forwardRef<VideoTabSectionRef, VideoTabSectionProps>(
@@ -52,6 +54,22 @@ const VideoTabSection = forwardRef<VideoTabSectionRef, VideoTabSectionProps>(
             seekTo: (seconds: number) => {
                 if (playerRef.current) {
                     playerRef.current.seekTo(seconds);
+                }
+            },
+            getCurrentVideoUrl: () => {
+                return videoUrl;
+            },
+            getCurrentVideoTitle: () => {
+                // Extract title from YouTube URL or return a default
+                try {
+                    const url = new URL(videoUrl);
+                    if (url.hostname.includes('youtube.com') || url.hostname.includes('youtu.be')) {
+                        // For now, return a simple title, could be enhanced to fetch actual title
+                        return 'YouTube Video';
+                    }
+                    return 'Video';
+                } catch {
+                    return 'Video';
                 }
             },
         }));
