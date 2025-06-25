@@ -136,9 +136,9 @@ export default function VideoControls({
         onRangeChange?.(leftRange, clampedTime);
     };
 
-    const handleExport = () => {
-        onExport?.(leftRange, rightRange);
-    };
+    // const handleExport = () => {
+    //     onExport?.(leftRange, rightRange);
+    // };
 
     return (
         <div className={`flex flex-row items-center gap-[2px] w-full ${className}`}>

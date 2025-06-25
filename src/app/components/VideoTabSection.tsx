@@ -93,6 +93,7 @@ const VideoTabSection = forwardRef<VideoTabSectionRef, VideoTabSectionProps>(
             onLoadingComplete();
         };
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const handlePlayerError = (error: any) => {
             console.error('Player error:', error);
             setError('Failed to load video. Please check the URL and try again.');

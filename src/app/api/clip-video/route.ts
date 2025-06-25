@@ -4,7 +4,7 @@ import path from "path";
 import fs from "fs";
 import { promisify } from "util";
 
-const writeFile = promisify(fs.writeFile);
+// const writeFile = promisify(fs.writeFile);
 const unlink = promisify(fs.unlink);
 const access = promisify(fs.access);
 
