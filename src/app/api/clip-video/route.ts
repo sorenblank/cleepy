@@ -59,17 +59,10 @@ async function runCommand(command: string, args: string[]): Promise<void> {
   });
 }
 
-// Get the path to the local yt-dlp binary
+// Get the path to yt-dlp - prefer system installation over local binary
 function getYtDlpPath(): string {
-  return path.join(
-    process.cwd(),
-    "src",
-    "app",
-    "api",
-    "clip-video",
-    "bin",
-    "yt-dlp"
-  );
+  // In serverless environments, use system yt-dlp if available
+  return "yt-dlp";
 }
 
 export async function POST(request: NextRequest) {
@@ -128,19 +121,17 @@ export async function POST(request: NextRequest) {
       "user-agent:Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
     ];
 
-    // Check if local yt-dlp is available
+    // Check if yt-dlp is available
     const ytDlpPath = getYtDlpPath();
     try {
-      await access(ytDlpPath);
       await runCommand(ytDlpPath, ["--version"]);
     } catch (_error) {
-      console.error("Local yt-dlp not found:", _error);
+      console.error("yt-dlp not found:", _error);
       return NextResponse.json(
         {
-          error:
-            "Video processing service unavailable. Local yt-dlp binary not found.",
+          error: "Video processing service unavailable. yt-dlp not found.",
           details:
-            "yt-dlp binary should be located at src/app/api/clip-video/bin/yt-dlp",
+            "yt-dlp is required for video processing. Please ensure it's installed in the deployment environment.",
         },
         { status: 503 }
       );
@@ -214,16 +205,15 @@ export async function POST(request: NextRequest) {
 // Health check endpoint
 export async function GET() {
   try {
-    // Check if local yt-dlp is available
+    // Check if yt-dlp is available
     const ytDlpPath = getYtDlpPath();
-    await access(ytDlpPath);
     await runCommand(ytDlpPath, ["--version"]);
     return NextResponse.json({ status: "healthy", ytdlp: "available" });
   } catch (error) {
     return NextResponse.json({
       status: "degraded",
       ytdlp: "unavailable",
-      message: "Local yt-dlp binary is required for video processing",
+      message: "yt-dlp is required for video processing",
     });
   }
 }
