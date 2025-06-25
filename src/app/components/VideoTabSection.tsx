@@ -181,21 +181,21 @@ const VideoTabSection = forwardRef<VideoTabSectionRef, VideoTabSectionProps>(
                                     top: '-200px',
                                     left: '0',
                                 }}
-                                config={{
-                                    youtube: {
-                                        playerVars: {
-                                            // Hides the player controls.
-                                            controls: 0,
-                                            // Shows related videos from the same channel.
-                                            rel: 0,
-                                            // Disables video annotations.
-                                            iv_load_policy: 3,
-                                            // The following are deprecated but don't hurt to have.
-                                            showinfo: 0,
-                                            modestbranding: 1,
-                                        },
-                                    },
-                                }}
+                            // config={{
+                            //     youtube: {
+                            //         playerVars: {
+                            //             // Hides the player controls.
+                            //             controls: 0,
+                            //             // Shows related videos from the same channel.
+                            //             rel: 0,
+                            //             // Disables video annotations.
+                            //             iv_load_policy: 3,
+                            //             // The following are deprecated but don't hurt to have.
+                            //             showinfo: 0,
+                            //             modestbranding: 1,
+                            //         },
+                            //     },
+                            // }}
                             />
                         </div>
 
